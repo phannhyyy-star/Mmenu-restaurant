@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MMENU | Quản trị nhà hàng</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f5f7f5;color:#24352b}
+header{background:#173d2b;color:white;padding:20px 5%;display:flex;justify-content:space-between;align-items:center}
+header h2{margin:0}
+.layout{display:flex;min-height:calc(100vh - 70px)}
+nav{width:225px;background:white;padding:22px 14px;flex-shrink:0}
+nav a{display:block;padding:13px 12px;margin-bottom:7px;border-radius:8px;color:#34473a;text-decoration:none}
+nav a.active,nav a:hover{background:#e5efe7;color:#205b37}
+main{padding:28px;width:100%;min-width:0}
+h1{margin-top:0}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.card,.panel{background:white;padding:20px;border-radius:12px;border:1px solid #e7ebe7}
+.card p{color:#68776c;margin:0 0 12px}
+.card strong{font-size:27px}
+.panel{margin-top:24px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:570px}
+th,td{text-align:left;padding:14px 10px;border-bottom:1px solid #edf0ed}
+th{color:#657368;font-size:13px}
+select,button{padding:9px;border-radius:7px;border:1px solid #d5ded6}
+button{background:#24613e;color:white;cursor:pointer}
+@media(max-width:800px){
+.layout{display:block}nav{width:100%;display:flex;overflow-x:auto;gap:5px}
+nav a{white-space:nowrap}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+main{padding:18px}
+}
+</style>
+</head>
+<body>
+<header>
+  <h2>🌿 MMENU ADMIN</h2>
+  <span>Quản trị nhà hàng</span>
+</header>
+<div class="layout">
+<nav>
+  <a class="active" href="#dashboard">📊 Tổng quan</a>
+  <a href="#orders">🧾 Đơn hàng</a>
+  <a href="index.html">🍽️ Thực đơn khách hàng</a>
+</nav>
+<main id="dashboard">
+  <h1>Tổng quan</h1>
+  <p>Chào mừng bạn đến với hệ thống quản lý Mmenu.</p>
+  <section class="cards">
+    <div class="card"><p>Đơn hàng hôm nay</p><strong>24</strong></div>
+    <div class="card"><p>Doanh thu mẫu</p><strong>4,8 tr</strong></div>
+    <div class="card"><p>Món ăn</p><strong>32</strong></div>
+    <div class="card"><p>Bàn đang sử dụng</p><strong>8/20</strong></div>
+  </section>
+  <section class="panel" id="orders">
+    <h2>Quản lý đơn hàng</h2>
+    <p>Các đơn dưới đây là dữ liệu minh họa.</p>
+    <table>
+      <thead>
+        <tr><th>Mã đơn</th><th>Bàn</th><th>Tổng tiền</th><th>Trạng thái</th></tr>
+      </thead>
+      <tbody id="orderList"></tbody>
+    </table>
+  </section>
+</main>
+</div>
+<script>
+const orders=[
+ {id:"MM001",table:"Bàn 01",total:125000,status:"Chờ xác nhận"},
+ {id:"MM002",table:"Bàn 03",total:89000,status:"Đang chế biến"},
+ {id:"MM003",table:"Bàn 05",total:165000,status:"Hoàn thành"}
+];
+function render(){
+ document.getElementById("orderList").innerHTML=orders.map((o,i)=>`
+ <tr>
+ <td>${o.id}</td><td>${o.table}</td>
+ <td>${o.total.toLocaleString("vi-VN")}đ</td>
+ <td><select onchange="updateStatus(${i},this.value)">
+ ${["Chờ xác nhận","Đang chế biến","Hoàn thành","Đã hủy"].map(s=>
+ `<option ${o.status===s?"selected":""}>${s}</option>`).join("")}
+ </select></td>
+ </tr>`).join("");
+}
+function updateStatus(i,value){orders[i].status=value}
+render();
+</script>
+</body>
+</html>
