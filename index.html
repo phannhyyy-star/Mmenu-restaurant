@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mmenu | Nhà hàng thông minh</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f8f5;
+      color: #24352b;
+    }
+    header {
+      background: #173d2b;
+      color: white;
+      padding: 20px 7%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    header h2 { margin: 0; }
+    .hero {
+      padding: 55px 7%;
+      background: #e6eee5;
+    }
+    .hero h1 { font-size: 38px; margin: 0 0 12px; }
+    .hero p { line-height: 1.7; }
+    main { padding: 30px 7%; }
+    .tools {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 25px;
+    }
+    input, select, button {
+      padding: 12px;
+      border: 1px solid #d8ded7;
+      border-radius: 9px;
+      font-size: 15px;
+    }
+    input { flex: 1; min-width: 180px; }
+    button {
+      cursor: pointer;
+      background: #24613e;
+      color: white;
+      border: none;
+    }
+    .menu {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .item {
+      background: white;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 3px 15px #183b2910;
+    }
+    .item img {
+      width: 100%;
+      height: 175px;
+      object-fit: cover;
+    }
+    .info { padding: 16px; }
+    .price {
+      color: #247443;
+      font-weight: bold;
+      margin: 12px 0;
+    }
+    .cart {
+      margin-top: 35px;
+      padding: 22px;
+      border-radius: 14px;
+      background: white;
+    }
+    footer {
+      padding: 25px;
+      text-align: center;
+      color: #66746a;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>🌿 Mmenu</h2>
+    <div>Giải pháp quản lý nhà hàng</div>
+  </header>
+
+  <section class="hero">
+    <h1>Chào mừng đến với Mmenu</h1>
+    <p>Thực đơn điện tử · Đặt món tiện lợi ·
+       Nâng cao trải nghiệm khách hàng</p>
+    <button onclick="document.querySelector('#thucdon')
+      .scrollIntoView({behavior:'smooth'})">
+      Khám phá thực đơn
+    </button>
+  </section>
+
+  <main>
+    <h2 id="thucdon">Thực đơn của chúng tôi</h2>
+    <div class="tools">
+      <input id="search" placeholder="Tìm món ăn..."
+        oninput="renderMenu()">
+      <select id="category" onchange="renderMenu()">
+        <option value="all">Tất cả danh mục</option>
+        <option value="main">Món chính</option>
+        <option value="drink">Đồ uống</option>
+      </select>
+    </div>
+
+    <div class="menu" id="menu"></div>
+
+    <section class="cart">
+      <h2>🛒 Giỏ hàng (<span id="count">0</span>)</h2>
+      <div id="cartItems">Bạn chưa chọn món nào.</div>
+      <h3>Tổng tiền: <span id="total">0</span>đ</h3>
+      <button onclick="checkout()">Xác nhận đơn mẫu</button>
+      <p id="notice"></p>
+    </section>
+  </main>
+
+  <footer>
+    Mmenu — Ứng dụng công nghệ trong kinh doanh F&B
+  </footer>
+
+  <script>
+    const dishes = [
+      {
+        id: 1, name: "Cơm gà", price: 45000,
+        category: "main",
+        img: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600"
+      },
+      {
+        id: 2, name: "Mì Ý", price: 55000,
+        category: "main",
+        img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=600"
+      },
+      {
+        id: 3, name: "Trà đào", price: 30000,
+        category: "drink",
+        img: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=600"
+      },
+      {
+        id: 4, name: "Cà phê", price: 28000,
+        category: "drink",
+        img: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600"
+      }
+    ];
+
+    const cart = {};
+
+    function money(n) {
+      return n.toLocaleString("vi-VN");
+    }
+
+    function renderMenu() {
+      const q = document.getElementById("search")
+        .value.toLowerCase();
+      const cat = document.getElementById("category").value;
+      const filtered = dishes.filter(d =>
+        d.name.toLowerCase().includes(q) &&
+        (cat === "all" || d.category === cat)
+      );
+
+      document.getElementById("menu").innerHTML =
+        filtered.map(d => `
+          <article class="item">
+            <img src="${d.img}" alt="${d.name}"
+              loading="lazy">
+            <div class="info">
+              <h3>${d.name}</h3>
+              <div class="price">${money(d.price)}đ</div>
+              <button onclick="addToCart(${d.id})">
+                + Thêm vào giỏ
+              </button>
+            </div>
+          </article>
+        `).join("") || "<p>Không tìm thấy món ăn.</p>";
+    }
+
+    function addToCart(id) {
+      cart[id] = (cart[id] || 0) + 1;
+      renderCart();
+    }
+
+    function renderCart() {
+      const entries = Object.entries(cart)
+        .filter(([id, qty]) => qty > 0);
+      const count = entries.reduce(
+        (sum, [id, qty]) => sum + qty, 0
+      );
+      const total = entries.reduce((sum, [id, qty]) =>
+        sum + dishes.find(d => d.id === Number(id)).price * qty,
+        0
+      );
+
+      document.getElementById("count").textContent = count;
+      document.getElementById("total").textContent = money(total);
+      document.getElementById("cartItems").innerHTML =
+        entries.map(([id, qty]) => {
+          const d = dishes.find(x => x.id === Number(id));
+          return `<p>${d.name} × ${qty}
+            <button onclick="changeQty(${id},-1)">−</button>
+            <button onclick="changeQty(${id},1)">+</button>
+          </p>`;
+        }).join("") || "Bạn chưa chọn món nào.";
+    }
+
+    function changeQty(id, delta) {
+      cart[id] = (cart[id] || 0) + delta;
+      if (cart[id] <= 0) delete cart[id];
+      renderCart();
+    }
+
+    function checkout() {
+      const count = Object.values(cart)
+        .reduce((sum, qty) => sum + qty, 0);
+      document.getElementById("notice").textContent =
+        count ? "Đã tạo đơn hàng mô phỏng thành công!" :
+        "Vui lòng chọn món trước.";
+    }
+
+    renderMenu();
+  </script>
+</body>
+</html>
